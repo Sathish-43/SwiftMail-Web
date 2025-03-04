@@ -4,12 +4,17 @@
     <title>Mail GUI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Quill.js CDN -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <script>
         function loadContent(page) {
             if (page === 'Compose') {
                 document.getElementById("mainContent").innerHTML = `
                     <h3>Compose Mail</h3>
-                    <form action="sendMail.jsp" method="post">
+                    <form action="sendMail.jsp" method="post" onsubmit="return prepareMessage()">
                         <div class="mb-3">
                             <label for="from" class="form-label">From</label>
                             <input type="email" class="form-control" id="from" name="from" required>
@@ -23,17 +28,39 @@
                             <input type="text" class="form-control" id="subject" name="subject" required>
                         </div>
                         <div class="mb-3">
-                            <label for="message" class="form-label">Message</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            <label class="form-label">Message</label>
+                            <div id="editor" style="height: 200px;"></div>
+                            <input type="hidden" id="message" name="message">
                         </div>
                         <button type="submit" class="btn btn-primary">Send</button>
                     </form>
                 `;
-            } else {
-                document.getElementById("mainContent").innerHTML = "Loading " + page + "...";
+
+                // Initialize Quill after content is loaded
                 setTimeout(() => {
-                    document.getElementById("mainContent").innerHTML = "<h3>" + page + "</h3><p>Content for " + page + "</p>";
-                }, 500);
+                    var quill = new Quill('#editor', {
+                        theme: 'snow',
+                        modules: {
+                            toolbar: [
+                                [{ font: [] }, { size: [] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ color: [] }, { background: [] }],
+                                [{ script: 'sub' }, { script: 'super' }],
+                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                [{ align: [] }],
+                                ['clean']
+                            ]
+                        }
+                    });
+
+                    // Assign Quill content to hidden input field before submitting
+                    window.prepareMessage = function () {
+                        document.getElementById("message").value = quill.root.innerHTML;
+                        return true;
+                    };
+                }, 100);
+            } else {
+                document.getElementById("mainContent").innerHTML = "<h3>" + page + "</h3><p>Content for " + page + "</p>";
             }
         }
     </script>

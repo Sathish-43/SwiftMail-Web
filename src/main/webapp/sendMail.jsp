@@ -3,10 +3,10 @@
     String from = request.getParameter("from");
     String to = request.getParameter("to");
     String subject = request.getParameter("subject");
-    String messageContent = request.getParameter("message");
+    String messageContent = request.getParameter("message"); // HTML content
 
     final String username = "sathishn1503@gmail.com"; // Replace with your email
-    final String password = "bzgauvkvrfrwdofe"; // Replace with your email password
+    final String password = "bzgauvkvrfrwdofe"; // Replace with your email app password
 
     // SMTP Server Configuration (Gmail example)
     Properties props = new Properties();
@@ -29,7 +29,9 @@
         message.setFrom(new InternetAddress(from));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         message.setSubject(subject);
-        message.setText(messageContent);
+
+        // Set HTML content
+        message.setContent(messageContent, "text/html; charset=utf-8");
 
         // Send the email
         Transport.send(message);
